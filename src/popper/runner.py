@@ -314,7 +314,14 @@ class StepRunner(object):
         }
 
         self._update_with_engine_config(args)
-        args.update(step.options)
+        options = dict(step.options)
+        if "volumes" in options:
+            step_vols = options.pop("volumes")
+            if isinstance(step_vols, list):
+                args["volumes"] = [*args["volumes"], *step_vols]
+            else:
+                args["volumes"] = [*args["volumes"], step_vols]
+        args.update(options)
         log.debug(f"container args: {pu.prettystr(args)}\n")
 
         return args
